@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Status HUD widget (editable)
+  - 각 요소는 id / inkscape:label 이 붙은 그룹(레이어)으로 나뉘어 있음
+  - 텍스트는 실제 <text> 이므로 Figma / Illustrator / Inkscape 에서 바로 수정 가능
+  - 색상은 아래 <style> 의 클래스만 바꾸면 전체 반영
+  - 캔버스 360 x 240 px (UI 기준 해상도, 엔진에서 2x/3x 로 내보내기 권장)
+-->
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+     width="610" height="240" viewBox="0 0 610 240">
+
+  <defs>
+    <style>
+      .frame-line   { fill: none; stroke: #2b3a6b; stroke-width: 2; }
+      .frame-dark   { fill: #0d1433; stroke: #8fa6d9; stroke-width: 2; }
+      .card-body    { fill: #bcd6f5; stroke: #ffffff; stroke-width: 2; }
+      .card-head    { fill: #7fa8e0; }
+      .card-ring    { fill: #1a2550; stroke: #ffffff; stroke-width: 1; }
+      .txt-dark     { fill: #10183a; font-family: 'DotGothic16', 'Press Start 2P', 'Courier New', monospace; font-weight: 700; }
+      .txt-light    { fill: #ffffff; font-family: 'DotGothic16', 'Press Start 2P', 'Courier New', monospace; font-weight: 700; }
+      .portrait-bg  { fill: #3e6d86; }
+      .portrait-rim { fill: none; stroke: #1a2550; stroke-width: 7; }
+      .portrait-edge{ fill: none; stroke: #8fa6d9; stroke-width: 2; }
+      .icon         { fill: none; stroke: #ffffff; stroke-width: 2.4; stroke-linecap: round; }
+
+      /* 게이지 */
+      .tube         { fill: #fcfcfa; }
+      .tube-shadow  { fill: #a9a9a6; }
+      .tick         { stroke: #6a6a68; stroke-width: 3; }
+      .fill-heart   { fill: #b88496; }
+      .fill-stamina { fill: #5d6d97; }
+      .txt-gauge    { fill: #55575c; font-family: 'Galmuri11', 'DotGothic16', 'Malgun Gothic', sans-serif; font-weight: 700; }
+    </style>
+
+    <!-- 초상화 클리핑 마스크 (원 안쪽만 보이도록) -->
+    <clipPath id="portraitClip">
+      <circle cx="268" cy="96" r="56"/>
+    </clipPath>
+
+    <!-- 초상화 배경 그라데이션 -->
+    <radialGradient id="portraitGlow" cx="50%" cy="40%" r="65%">
+      <stop offset="0%"  stop-color="#6fa3b8"/>
+      <stop offset="100%" stop-color="#1f3f5a"/>
+    </radialGradient>
+  </defs>
+
+  <!-- ===================== 1. 연결선 ===================== -->
+  <g id="connectors" inkscape:groupmode="layer" inkscape:label="Connectors">
+    <!-- 달력 상단 고리 → 초상화 -->
+    <polyline class="frame-line" points="88,24 88,12 200,12 200,40 212,40"/>
+    <!-- 시간 박스 → 날씨 아이콘 → 초상화 -->
+    <polyline class="frame-line" points="168,156 196,156 196,186"/>
+    <polyline class="frame-line" points="196,156 196,120 212,120"/>
+  </g>
+
+  <!-- ===================== 2. 날짜 카드 ===================== -->
+  <g id="date_card" inkscape:groupmode="layer" inkscape:label="Date Card">
+    <rect class="card-body" x="18" y="28" width="150" height="100" rx="3"/>
+    <rect class="card-head" x="19" y="29" width="148" height="10"/>
+    <!-- 달력 스프링 -->
+    <g id="card_rings">
+      <circle class="card-ring" cx="40"  cy="30" r="3"/>
+      <circle class="card-ring" cx="64"  cy="30" r="3"/>
+      <circle class="card-ring" cx="88"  cy="30" r="4.5"/>
+      <circle class="card-ring" cx="112" cy="30" r="3"/>
+      <circle class="card-ring" cx="136" cy="30" r="3"/>
+    </g>
+    <!-- 요일 (영문) -->
+    <text id="txt_weekday" class="txt-dark" x="30" y="70" font-size="22">Fri</text>
+    <!-- 요일 (한자/한글 등 보조 표기) -->
+    <text id="txt_weekday_sub" class="txt-dark" x="156" y="70" font-size="22" text-anchor="end">金</text>
+    <!-- 날짜 -->
+    <text id="txt_date" class="txt-dark" x="156" y="112" font-size="24" text-anchor="end">19/05</text>
+  </g>
+
+  <!-- ===================== 3. 시간 ===================== -->
+  <g id="time_box" inkscape:groupmode="layer" inkscape:label="Time">
+    <rect class="frame-dark" x="18" y="140" width="150" height="32" rx="3"/>
+    <rect x="22" y="144" width="142" height="24" rx="2" fill="none" stroke="#3b4f8a" stroke-width="1"/>
+    <text id="txt_time" class="txt-light" x="30" y="164" font-size="20">11:25</text>
+    <text id="txt_ampm" class="txt-light" x="102" y="164" font-size="13">pm</text>
+  </g>
+
+  <!-- ===================== 4. 날씨 아이콘 ===================== -->
+  <g id="weather_icon" inkscape:groupmode="layer" inkscape:label="Weather">
+    <rect class="frame-dark" x="180" y="188" width="36" height="36" rx="3"/>
+    <!-- 눈 결정 (다른 날씨로 바꿀 땐 이 그룹만 교체) -->
+    <g id="icon_snow" class="icon" transform="translate(198 206)">
+      <line x1="0" y1="-12" x2="0" y2="12"/>
+      <line x1="-10.4" y1="-6" x2="10.4" y2="6"/>
+      <line x1="-10.4" y1="6" x2="10.4" y2="-6"/>
+      <polyline points="-3,-9 0,-6 3,-9"/>
+      <polyline points="-3,9 0,6 3,9"/>
+      <polyline points="-9.3,-1.9 -5.2,-3 -6.3,-7.1" transform="rotate(0)"/>
+      <polyline points="9.3,1.9 5.2,3 6.3,7.1"/>
+      <polyline points="9.3,-1.9 5.2,-3 6.3,-7.1"/>
+      <polyline points="-9.3,1.9 -5.2,3 -6.3,7.1"/>
+    </g>
+  </g>
+
+  <!-- ===================== 5. 캐릭터 초상화 ===================== -->
+  <g id="portrait" inkscape:groupmode="layer" inkscape:label="Portrait">
+    <circle cx="268" cy="96" r="56" fill="url(#portraitGlow)"/>
+    <!-- 캐릭터 이미지 자리: 이 그룹 안의 도형을 지우고 <image> 로 교체 -->
+    <g id="portrait_image_slot" clip-path="url(#portraitClip)">
+      <!-- 임시 플레이스홀더 캐릭터 (졸린 표정) -->
+      <ellipse cx="268" cy="112" rx="38" ry="32" fill="#cfe3ea"/>
+      <ellipse cx="268" cy="160" rx="46" ry="26" fill="#cfe3ea"/>
+      <path d="M252,108 q6,5 12,0" fill="none" stroke="#2a3b55" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="M272,108 q6,5 12,0" fill="none" stroke="#2a3b55" stroke-width="2.4" stroke-linecap="round"/>
+      <ellipse cx="268" cy="122" rx="3" ry="2" fill="#2a3b55"/>
+      <circle cx="248" cy="120" r="5" fill="#e9a9b8" opacity="0.6"/>
+      <circle cx="288" cy="120" r="5" fill="#e9a9b8" opacity="0.6"/>
+    </g>
+    <circle class="portrait-rim"  cx="268" cy="96" r="59.5"/>
+    <circle class="portrait-edge" cx="268" cy="96" r="63.5"/>
+    <circle class="portrait-edge" cx="268" cy="96" r="55.5"/>
+  </g>
+
+  <!-- ===================== 6. 상태 라벨 ===================== -->
+  <g id="status_label" inkscape:groupmode="layer" inkscape:label="Status">
+    <rect class="frame-dark" x="226" y="150" width="100" height="30" rx="3"/>
+    <rect x="230" y="154" width="92" height="22" rx="2" fill="none" stroke="#3b4f8a" stroke-width="1"/>
+    <text id="txt_status" class="txt-light" x="276" y="171" font-size="16" text-anchor="middle">Sleepy</text>
+  </g>
+
+  <!-- ===================== 7. 심박 / 기력 게이지 (배경 없음) ===================== -->
+  <!-- 값 조정: *_fill 의 height = 96 x 값, y = 146 - height -->
+  <g id="vitals" inkscape:groupmode="layer" inkscape:label="Vitals">
+    <!-- 심박 아이콘 (픽셀 하트) -->
+    <path id="icon_heart" class="fill-heart" shape-rendering="crispEdges"
+          d="M350,84h8v4h-8zM362,84h8v4h-8zM346,88h28v4h-28zM346,92h28v4h-28zM350,96h20v4h-20zM354,100h12v4h-12zM358,104h4v4h-4z"/>
+
+    <g id="gauge_heart" inkscape:label="Gauge 심박">
+      <g id="gauge_heart_ticks">
+        <line class="tick" x1="384" y1="46"  x2="398" y2="46"/>
+        <line class="tick" x1="384" y1="66"  x2="398" y2="66"/>
+        <line class="tick" x1="384" y1="86"  x2="398" y2="86"/>
+        <line class="tick" x1="384" y1="106" x2="398" y2="106"/>
+        <line class="tick" x1="384" y1="126" x2="398" y2="126"/>
+        <line class="tick" x1="384" y1="146" x2="398" y2="146"/>
+      </g>
+      <rect class="tube-shadow" x="406" y="40" width="44" height="116" rx="18"/>
+      <rect class="tube" x="410" y="38" width="44" height="116" rx="18"/>
+      <!-- 값: 62% -->
+      <rect id="gauge_heart_fill" class="fill-heart" x="417" y="86" width="30" height="60" rx="6"/>
+      <text id="gauge_heart_label" class="txt-gauge" x="432" y="182" font-size="21" text-anchor="middle">심박</text>
+    </g>
+
+    <g id="gauge_stamina" inkscape:label="Gauge 기력">
+      <g id="gauge_stamina_ticks">
+        <line class="tick" x1="474" y1="46"  x2="488" y2="46"/>
+        <line class="tick" x1="474" y1="66"  x2="488" y2="66"/>
+        <line class="tick" x1="474" y1="86"  x2="488" y2="86"/>
+        <line class="tick" x1="474" y1="106" x2="488" y2="106"/>
+        <line class="tick" x1="474" y1="126" x2="488" y2="126"/>
+        <line class="tick" x1="474" y1="146" x2="488" y2="146"/>
+      </g>
+      <rect class="tube-shadow" x="496" y="40" width="44" height="116" rx="18"/>
+      <rect class="tube" x="500" y="38" width="44" height="116" rx="18"/>
+      <!-- 값: 80% -->
+      <rect id="gauge_stamina_fill" class="fill-stamina" x="507" y="69" width="30" height="77" rx="6"/>
+      <text id="gauge_stamina_label" class="txt-gauge" x="522" y="182" font-size="21" text-anchor="middle">기력</text>
+    </g>
+
+    <!-- 기력 아이콘 (픽셀 반달) -->
+    <path id="icon_moon" class="fill-stamina" shape-rendering="crispEdges"
+          d="M568,78h20v4h-20zM564,82h16v4h-16zM584,82h8v4h-8zM560,86h20v4h-20zM588,86h8v4h-8zM560,90h20v4h-20zM592,90h4v4h-4zM560,94h20v4h-20zM592,94h4v4h-4zM560,98h20v4h-20zM592,98h4v4h-4zM560,102h20v4h-20zM588,102h8v4h-8zM564,106h16v4h-16zM584,106h8v4h-8zM568,110h20v4h-20z"/>
+  </g>
+</svg>
